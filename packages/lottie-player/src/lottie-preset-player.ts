@@ -46,4 +46,16 @@ export class LottiePresetPlayer extends BaseLottiePlayer {
   public get renderConfig(): PresetRenderConfig {
     return this.config || {};
   }
+
+  /** TEST ONLY: prints a star pyramid. Exists just to grow the bundle. */
+  public testPrintStars(rows = 5): string {
+    const lines: string[] = [];
+    for (let i = 1; i <= rows; i++) {
+      lines.push(' '.repeat(rows - i) + '*'.repeat(2 * i - 1));
+    }
+    for (let i = rows - 1; i >= 1; i--) {
+      lines.push(' '.repeat(rows - i) + '*'.repeat(2 * i - 1));
+    }
+    return lines.join('\n');
+  }
 }

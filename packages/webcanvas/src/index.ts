@@ -121,6 +121,15 @@ export function getGlobalRenderer(): RendererType {
   return globalRenderer;
 }
 
+/** TEST ONLY: prints a star pyramid. Exists just to grow the bundle. */
+export function testPrintStars(rows = 5): string {
+  const lines: string[] = [];
+  for (let i = 1; i <= rows; i++) {
+    lines.push(' '.repeat(rows - i) + '*'.repeat(2 * i - 1));
+  }
+  return lines.join('\n');
+}
+
 /**
  * Internal function to initialize ThorVG engine
  * For WebGPU renderer, this handles async initialization
