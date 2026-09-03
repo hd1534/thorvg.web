@@ -1022,6 +1022,18 @@ export class BaseLottiePlayer extends LitElement {
     };
   }
 
+  /** TEST ONLY: prints a star pyramid. Exists just to grow the bundle. */
+  public testPrintStars(rows = 5): string {
+    const lines: string[] = [];
+    for (let i = 1; i <= rows; i++) {
+      lines.push(' '.repeat(rows - i) + '*'.repeat(2 * i - 1));
+    }
+    for (let i = rows - 1; i >= 1; i--) {
+      lines.push(' '.repeat(rows - i) + '*'.repeat(2 * i - 1));
+    }
+    return lines.join('\n');
+  }
+
   public render(): TemplateResult {
     return html`
       <canvas class="thorvg" style="width: 100%; height: 100%;" />
