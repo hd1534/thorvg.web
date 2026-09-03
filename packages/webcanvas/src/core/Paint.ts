@@ -336,8 +336,29 @@ export abstract class Paint extends WasmObject {
    * ```
    */
   public transform(matrix: Matrix): this {
-    // TEST ONLY: body removed to shrink the bundle.
-    void matrix;
+    const Module = getModule();
+
+    // Allocate memory for the matrix (9 floats)
+    const matrixPtr = Module._malloc(36); // 9 * 4 bytes
+
+    try {
+      const view = new Float32Array(Module.HEAPF32.buffer, matrixPtr, 9);
+      view[0] = matrix.e11;
+      view[1] = matrix.e12;
+      view[2] = matrix.e13;
+      view[3] = matrix.e21;
+      view[4] = matrix.e22;
+      view[5] = matrix.e23;
+      view[6] = matrix.e31;
+      view[7] = matrix.e32;
+      view[8] = matrix.e33;
+
+      const result = Module._tvg_paint_set_transform(this.ptr, matrixPtr);
+      checkResult(result, 'transform');
+    } finally {
+      Module._free(matrixPtr);
+    }
+
     return this;
   }
 

@@ -121,6 +121,8 @@ export function getGlobalRenderer(): RendererType {
   return globalRenderer;
 }
 
+// TEST ONLY: comment-only change, the bundle must stay identical.
+
 /**
  * Internal function to initialize ThorVG engine
  * For WebGPU renderer, this handles async initialization
