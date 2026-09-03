@@ -392,7 +392,8 @@ function renderPackage(name, sizes) {
     `<details${open}>`,
     `<summary><b>${name}</b> — ${title}</summary>`,
     '',
-    `Total = thorvg.wasm + ${ok[0]?.mod ?? 'esm'} bundle. ${UP} increased, ${DOWN} decreased.`,
+    `Total = thorvg.wasm + ${ok[0]?.mod ?? 'esm'} bundle. ${UP} increased, ${DOWN} decreased.` +
+      ` \`default\` is the root export (\`import '${name}'\`); the other rows are subpath exports (\`import '${name}/<preset>'\`).`,
     '',
     ...summaryTable,
     '',
