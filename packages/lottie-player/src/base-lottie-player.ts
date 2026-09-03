@@ -410,7 +410,34 @@ export class BaseLottiePlayer extends LitElement {
   }
 
   private _viewport(): void {
-    // TEST ONLY: body removed to shrink the bundle.
+    const { left, right, top, bottom } = this.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let x = 0;
+    let y = 0;
+    let width = this.canvas!.width;
+    let height = this.canvas!.height;
+
+    if (left < 0) {
+      x = Math.abs(left);
+      width -= x;
+    }
+
+    if (top < 0) {
+      y = Math.abs(top);
+      height -= y;
+    }
+
+    if (right > windowWidth) {
+      width -= right - windowWidth;
+    }
+
+    if (bottom > windowHeight) {
+      height -= bottom - windowHeight;
+    }
+
+    this.TVG!.viewport(x, y, width, height);
   }
 
   private _observerCallback(entries: IntersectionObserverEntry[]) {
@@ -531,8 +558,57 @@ export class BaseLottiePlayer extends LitElement {
   }
 
   private async _audioResolver(info: AudioInfo): Promise<void> {
-    // TEST ONLY: body removed to shrink the bundle.
-    void info;
+    if (!this._audioCtx) {
+      this._audioCtx = new (window.AudioContext || window.webkitAudioContext!)();
+    }
+
+    if (!this._audioMasterGain) {
+      this._audioMasterGain = this._audioCtx.createGain();
+      this._audioMasterGain.connect(this._audioCtx.destination);
+      this._applyVolume();
+    }
+
+    if (!info.active) {
+      this._stopVoice(info.id);
+      return;
+    }
+
+    let buffer = this._audioBuffers.get(info.id);
+    if (!buffer) {
+      try {
+        const data = info.data
+          ? info.data.slice().buffer
+          : await fetch(info.path!).then(r => r.arrayBuffer());
+        buffer = await this._audioCtx.decodeAudioData(data);
+        this._audioBuffers.set(info.id, buffer);
+      } catch (err) {
+        this.currentState = PlayerState.Error;
+        this.dispatchEvent(new CustomEvent(PlayerEvent.Error));
+        return;
+      }
+    }
+
+    this._stopVoice(info.id, true);
+
+    const gain = this._audioCtx.createGain();
+    gain.gain.value = info.volume;
+    gain.connect(this._audioMasterGain);
+
+    const source = this._audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(gain);
+    const startOffset = buffer.duration > 0
+      ? ((info.offset % buffer.duration) + buffer.duration) % buffer.duration
+      : 0;
+    source.start(0, startOffset);
+
+    this._audioVoices.set(info.id, {
+      info,
+      source,
+      baseFrame: this.currentFrame,
+      baseOffset: info.offset,
+    });
   }
 
   private _flush(): void {
@@ -944,18 +1020,6 @@ export class BaseLottiePlayer extends LitElement {
     return {
       THORVG_VERSION,
     };
-  }
-
-  /** TEST ONLY: prints a star pyramid. Exists just to grow the bundle. */
-  public testPrintStars(rows = 5): string {
-    const lines: string[] = [];
-    for (let i = 1; i <= rows; i++) {
-      lines.push(' '.repeat(rows - i) + '*'.repeat(2 * i - 1));
-    }
-    for (let i = rows - 1; i >= 1; i--) {
-      lines.push(' '.repeat(rows - i) + '*'.repeat(2 * i - 1));
-    }
-    return lines.join('\n');
   }
 
   public render(): TemplateResult {

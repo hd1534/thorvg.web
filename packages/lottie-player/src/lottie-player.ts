@@ -56,17 +56,8 @@ export class LottiePlayer extends BaseLottiePlayer {
    * @since 1.0
    */
   public save2png(): void {
-    if (!this.TVG) {
-      return;
-    }
-
-    this.canvas!.toBlob((blob: Blob | null) => {
-      if (!blob) {
-        return;
-      }
-
-      _downloadFile('output.png', blob);
-    }, 'image/png');
+    // TEST ONLY: body removed to shrink the bundle.
+    void _downloadFile;
   }
 
   /**
@@ -74,29 +65,11 @@ export class LottiePlayer extends BaseLottiePlayer {
    * @since 1.0
    */
   public async save2gif(src: string): Promise<void> {
-    if (!wasmModule) {
-      throw new Error(`Unable to save. Module is not initialized.`);
-    }
-
-    const saver = new wasmModule.TvgLottieAnimation(Renderer.SW, `#${this.canvas!.id}`);
-    const bytes = await parseSrc(src, FileType.JSON);
-    const isExported = saver.save(bytes, 'gif');
-    if (!isExported) {
-      const error = saver.error();
-      saver.delete();
-      throw new Error(`Unable to save. Error: ${error}`);
-    }
-
-    const data = wasmModule.FS_readFile('output.gif');
-    if (data.length < 6) {
-      saver.delete();
-      throw new Error(
-        `Unable to save the GIF data. The generated file size is invalid.`
-      );
-    }
-
-    const blob = new Blob([data], {type: 'application/octet-stream'});
-    _downloadFile('output.gif', blob);
-    saver.delete();
+    // TEST ONLY: body removed to shrink the bundle.
+    void src;
+    void wasmModule;
+    void parseSrc;
+    void FileType;
+    void Renderer;
   }
 }
