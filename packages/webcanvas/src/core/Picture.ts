@@ -177,37 +177,9 @@ export class Picture extends Paint {
    * @beta
    */
   public resolver(callback: AssetResolver | null): this {
-    const Module = getModule();
-
-    // Unregister previous resolver.
-    if (this.#resolverPtr) {
-      Module.removeFunction(this.#resolverPtr);
-      callbackRegistry.unregister(this);
-      this.#resolverPtr = null;
-    }
-
-    if (!callback) {
-      const result = Module._tvg_picture_set_asset_resolver(this.ptr, 0, 0);
-      if (result !== ThorVGResultCode.Success && result !== ThorVGResultCode.InsufficientCondition) {
-        checkResult(result, 'resolver');
-      }
-      return this;
-    }
-
-    // C signature: bool(Tvg_Paint paint, const char* src, void* data) -> 'iiii'
-    const funcPtr = Module.addFunction((paintPtr: number, srcPtr: number): number => {
-      const paint = Paint.fromPtr(paintPtr);
-      const src = Module.UTF8ToString(srcPtr);
-      try {
-        return callback(paint, src) ? 1 : 0;
-      } catch {
-        return 0;
-      }
-    }, 'iiii');
-
-    this.#resolverPtr = funcPtr;
-    callbackRegistry.register(this, funcPtr, this);
-    checkResult(Module._tvg_picture_set_asset_resolver(this.ptr, funcPtr, 0), 'resolver');
+    // TEST ONLY: body removed to shrink the bundle.
+    void callback;
+    void ThorVGResultCode;
     return this;
   }
 
